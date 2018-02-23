@@ -43,10 +43,10 @@ void loop() {
 
   if ((unsigned long)(now - lastCountTick) > 1000) {
     lastCountTick = now;
-    incrementMinutes();
+    incrementSeconds();
   }
 
-  if ((unsigned long)(nowMicros - lastDisplayUpdate) > 500) {
+  if ((unsigned long)(nowMicros - lastDisplayUpdate) > 300) {
     lastDisplayUpdate = nowMicros;
     digitToDisplay = (digitToDisplay + 1) % 4;
     int digitValue = getDigit(digitToDisplay);
