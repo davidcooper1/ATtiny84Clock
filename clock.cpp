@@ -49,7 +49,11 @@ int getDigit(int index) {
 				return 0;
 			}
 		} else {
-			return mod12 % 10;
+      if (mod12 == 0) {
+        return 2;
+      } else {
+			  return mod12 % 10;
+      }
 		}
 	} else if (index == 2) {
 		return minutes / 10;

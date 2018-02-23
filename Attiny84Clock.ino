@@ -5,16 +5,16 @@
 /*  These pins send data about the currently displayed digit.
  *  Note: They are set in this order to more closely match the inputs of the 4511 ic.
  */ 
-const int B = 0;
-const int C = 1;
-const int D = 2;
-const int A = 3;
+const int B = 10;
+const int C = 9;
+const int D = 8;
+const int A = 7;
 
 // These pins are meant to turn on/off transistors used to sink current from the display.
-const int digit0 = 4;
-const int digit1 = 5;
-const int digit2 = 6;
-const int digit3 = 7;
+const int digit0 = 0;
+const int digit1 = 1;
+const int digit2 = 2;
+const int digit3 = 3;
 
 unsigned long lastCountTick = 0;
 unsigned long lastDisplayUpdate = 0;
@@ -33,22 +33,24 @@ void setup() {
   pinMode(digit3, OUTPUT);
 
   lastCountTick = millis();
-  lastDisplayUpdate = millis();
+  lastDisplayUpdate = micros();
 }
 
 void loop() {
 
   unsigned long now = millis();
+  unsigned long nowMicros = micros();
 
   if ((unsigned long)(now - lastCountTick) > 1000) {
     lastCountTick = now;
     incrementMinutes();
   }
 
-  if ((unsigned long)(now - lastDisplayUpdate) > 1) {
-    lastDisplayUpdate = now;
+  if ((unsigned long)(nowMicros - lastDisplayUpdate) > 500) {
+    lastDisplayUpdate = nowMicros;
     digitToDisplay = (digitToDisplay + 1) % 4;
     int digitValue = getDigit(digitToDisplay);
+    blankDisplayDigit(); 
     setBCDOutput(digitValue);
     if (digitValue == 0 && digitToDisplay == 0) {
       blankDisplayDigit();
