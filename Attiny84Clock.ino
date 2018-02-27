@@ -16,8 +16,19 @@ const int digit1 = 1;
 const int digit2 = 2;
 const int digit3 = 3;
 
+// These pins are button inputs to set hours and minutes.
+const int hourButton = 4;
+const int minuteButton = 5;
+
+// This pin is used to control the colon on the LED display.
+const int colon = 6;
+
 unsigned long lastCountTick = 0;
 unsigned long lastDisplayUpdate = 0;
+unsigned long lastButtonPoll = 0;
+
+unsigned long colonToggledOn = 0;
+bool colonOn = false;
 
 int digitToDisplay = 0;
 
@@ -32,18 +43,45 @@ void setup() {
   pinMode(digit2, OUTPUT);
   pinMode(digit3, OUTPUT);
 
+  pinMode(hourButton, INPUT);
+  pinMode(minuteButton, INPUT);
+
+  pinMode(colon, OUTPUT);
+
   lastCountTick = millis();
+  lastButtonPoll = millis();
   lastDisplayUpdate = micros();
 }
 
 void loop() {
 
+  int hourButtonReading = digitalRead(hourButton);
+  int minuteButtonReading = digitalRead(minuteButton);
+
   unsigned long now = millis();
   unsigned long nowMicros = micros();
 
+  if ((unsigned long)(now - lastButtonPoll) > 500) {
+    lastButtonPoll = now;
+    if (hourButtonReading == HIGH) {
+      incrementHours();
+    }
+    if (minuteButtonReading == HIGH) {
+      incrementMinutes();
+    }
+  }
+
   if ((unsigned long)(now - lastCountTick) > 1000) {
     lastCountTick = now;
+    colonOn = true;
+    colonToggledOn = now;
+    digitalWrite(colon, HIGH);
     incrementSeconds();
+  }
+
+  if (colonOn && (unsigned long)(now - colonToggledOn) > 500) {
+    colonOn = false;
+    digitalWrite(colon, LOW);
   }
 
   if ((unsigned long)(nowMicros - lastDisplayUpdate) > 300) {
